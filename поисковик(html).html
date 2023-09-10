@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Голосовой поиск в Интернете</title>
+   <!-- Загружаем стиль Awesomplete из другого источника -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.1/awesomplete.min.css">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+
+        #searchInput {
+            width: 70%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin: 0 auto;
+            display: block;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px auto;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #results {
+            list-style-type: none;
+            padding: 0;
+            margin: 20px auto;
+            max-width: 800px;
+        }
+
+        #results li {
+            background-color: #fff;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        #results li:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        #results a {
+            color: #333;
+            text-decoration: none;
+        }
+
+        #results p {
+            color: #777;
+        }
+    </style>
+
+</head>
+<body>
+    <h1>Голосовой поиск в Интернете</h1>
+
+     <!-- Добавляем поле ввода с автозаполнением -->
+     <input type="text" id="searchInput" placeholder="Введите запрос" list="suggestions">
+
+     <datalist id="suggestions">
+         <!-- Здесь будут отображаться подсказки при вводе -->
+     </datalist>
+
+    <button onclick="search()">Искать</button>
+    <button onclick="startListening()">Голосовой поиск</button>
+
+    <h2>Результаты:</h2>
+    <ul id="results">
+        <!-- Здесь будут отображаться результаты поиска -->
+    </ul>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/awesomplete/1.1.1/awesomplete.min.js"></script>
+    <script>
+        // Функция для выполнения текстового поиска
+        function search() {
+            const query = document.getElementById("searchInput").value;
+            const resultsContainer = document.getElementById("results");
+
+            // Ваш API-ключ для Google Custom Search API
+            const apiKey = 'AIzaSyCvbP7FnVhZWemGq78YBcjEU-48yupeaqM';
+
+            // ID вашей поисковой выдачи Custom Search Engine (CSE)
+            const cx = 'f44ca7fde33e04927';
+
+            // Формируем URL для выполнения запроса к Google Custom Search API
+            const url = `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&cx=${cx}&key=${apiKey}`;
+
+            // Выполняем запрос
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    // Очищаем предыдущие результаты
+                    resultsContainer.innerHTML = '';
+
+                    // Обрабатываем результаты поиска
+                    data.items.forEach(item => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<a href="${item.link}" target="_blank">${item.title}</a><p>${item.snippet}</p>`;
+                        resultsContainer.appendChild(li);
+                    });
+                });
+            }
+                //     // Сохраняем вопрос в локальное хранилище
+                //     saveQuestion(query);
+                // })
+                // .catch(error => {
+                //     console.error('Ошибка при выполнении запроса:', error);
+        //         });
+        
+
+        // Функция для начала распознавания речи
+        function startListening() {
+            const recognition = new webkitSpeechRecognition();
+            recognition.lang = 'ru-RU'; // Установите желаемый язык распознавания
+            recognition.onresult = (event) => {
+                const result = event.results[0][0].transcript;
+                document.getElementById("searchInput").value = result;
+                search(); // Выполняем поиск по голосовому запросу
+            };
+            recognition.start();
+        }
+
+        // Добавляем обработчик события для клавиши Enter
+        document.getElementById("searchInput").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                search(); // Выполняем поиск при нажатии Enter
+            }
+        });
+
+      // Слушаем событие input и обновляем список автозаполнения
+searchInput.addEventListener("input", function() {
+    const query = searchInput.value;
+
+    // Запрос к вашему серверу для получения подсказок
+    fetch(`http://localhost:3000/suggestions?q=${encodeURIComponent(query)}`)
+        .then(response => response.json())
+        .then(data => {
+            // Очищаем предыдущие подсказки
+            suggestions.innerHTML = '';
+
+            // Добавляем новые подсказки
+            data.forEach(item => {
+                const option = document.createElement('option');
+                option.value = item.phrase;
+                suggestions.appendChild(option);
+            });
+        })
+        .catch(error => {
+            console.error('Ошибка при получении подсказок:', error);
+        });
+});
+
+    </script>
+</body>
+</html>
