@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>День Рождение</title>
+    <style>
+        .button {
+            display: inline-block;
+            padding: 15px 25px;
+            font-size: 24px;
+            cursor: pointer;
+            text-align: center;
+            text-decoration: none;
+            outline: none;
+            color: #fff;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 9px #999;
+        }
+
+        .button:hover {
+            background-color: #3e8e41
+        }
+
+        .button:active {
+            background-color: #3e8e41;
+            box-shadow: 0 5px #666;
+            transform: translateY(4px);
+        }
+
+        body {
+            background-color: darkviolet;
+            align-items: center;
+        }
+    </style>
+</head>
+
+<body>
+    <button id="btn1" class="button" style="display: none;"> <a
+            href="https://scratch.mit.edu/projects/399576763/" target="_blank">ПОДАРОК</a>
+    </button>
+    <script>
+        // To Do: 
+        // 1) Придумать способ как генирировать слова
+        const words = [
+            "день рождения",
+        ];
+        let oneWord = words[Math.floor(Math.random() * words.length)];
+        let answers = [];
+        for (let i = 0; i < oneWord.length; i++) {
+            if (oneWord[i] === ' ') {
+                answers[i] = ' ';
+            } else {
+                answers[i] = "_";
+            }
+        }
+        let spacesNumber = oneWord.split(' ').length - 1;
+        let remainingLetters = oneWord.length - spacesNumber;
+        // игровой цикл
+        while (remainingLetters > 0) {
+            // показываем состояние игры
+            alert(answers.join(" "));
+            // запрашиваем вариант ответа
+            let guess = prompt("Что сегодня за празник?!");
+            if (guess == null) {
+                break;
+            } else if (guess.length !== 1) {
+                alert("Пожалуйста, введите одиночную букву.")
+            } else {
+                // обновить answers и remainingLetters
+                for (let i = 0; i < oneWord.length; i++) {
+                    // нахождение угаданной буквы
+                    if (oneWord[i] == guess) {
+                        answers[i] = guess;
+                        remainingLetters--;
+                    }
+
+                }
+            }
+
+            // конец игрового цикла
+        }
+        // отоброжение результата
+        if (remainingLetters == 0) {
+            alert(answers.join(" "));
+            alert("Ты победила! С днём рождения!!!");
+            let btn = document.getElementById("btn1").style.display = 'block';
+        } else {
+            alert("Попробуй еще раз!");
+        }
+    </script>
+</body>
+
+</html>
